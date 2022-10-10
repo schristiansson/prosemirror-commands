@@ -308,13 +308,14 @@ export const splitBlock: Command = (state, dispatch) => {
     if (state.selection instanceof TextSelection || state.selection instanceof AllSelection) tr.deleteSelection()
     let deflt = $from.depth == 0 ? null : defaultBlockAt($from.node(-1).contentMatchAt($from.indexAfter(-1)))
     let types = atEnd && deflt ? [{type: deflt}] : undefined
-    let can = canSplit(tr.doc, tr.mapping.map($from.pos), 1, types)
-    if (!types && !can && canSplit(tr.doc, tr.mapping.map($from.pos), 1, deflt ? [{type: deflt}] : undefined)) {
+    let fromPos = $from.pos + 1;
+    let can = canSplit(tr.doc, tr.mapping.map(fromPos), 1, types)
+    if (!types && !can && canSplit(tr.doc, tr.mapping.map(fromPos), 1, deflt ? [{type: deflt}] : undefined)) {
       if (deflt) types = [{type: deflt}]
       can = true
     }
     if (can) {
-      tr.split(tr.mapping.map($from.pos), 1, types)
+      tr.split(tr.mapping.map(fromPos), 1, types)
       if (!atEnd && !$from.parentOffset && $from.parent.type != deflt) {
         let first = tr.mapping.map($from.before()), $first = tr.doc.resolve(first)
         if (deflt && $from.node(-1).canReplaceWith($first.index(), $first.index() + 1, deflt))
